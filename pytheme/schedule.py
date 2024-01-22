@@ -76,7 +76,7 @@ def run_scheduling(config: dict[str, list[dict] | Any]) -> None:
         sched_theme = theme_schedule.current_scheduled_theme()
 
         if sched_theme.ask:
-            if not message.ask_ifyes(f"Apply theme, {sched_theme.name}?"):
+            if not message.ask_ifyes(f'Apply theme, "{sched_theme.name}"?'):
                 ask_dt = datetime.now() + timedelta(minutes=ask_interval_mins)
                 next_dt = theme_schedule.next_scheduled_datetime()
                 if ask_dt < next_dt:
