@@ -10,19 +10,23 @@ from .theme import ColorMode, Personalization, parse_themes
 from .utils import read_config
 
 
-@click.group(invoke_without_command=True)
+@click.group()
 @click.pass_context
 def cli(ctx: Any) -> None:
     config = read_config(fp=ctx.obj["fp"])
     ctx.obj["config"] = config
-    if ctx.invoked_subcommand is None:
-        run_scheduling(config=config)
 
 
 @click.group()
 @click.pass_context
 def theme(ctx: Any) -> None:
     pass
+
+
+@theme.command()
+@click.pass_context
+def schedule(ctx: Any) -> None:
+    run_scheduling(config=ctx.obj["config"])
 
 
 @theme.command()
