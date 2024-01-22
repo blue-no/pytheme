@@ -16,7 +16,6 @@ def cli(ctx: Any) -> None:
     config = read_config(fp=ctx.obj["fp"])
     ctx.obj["config"] = config
     if ctx.invoked_subcommand is None:
-        click.echo("Running scheduling...")
         run_scheduling(config=config)
 
 
