@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sched
 import time
+from dataclasses import dataclass
 from datetime import datetime
 from datetime import time as dttime
 from datetime import timedelta
@@ -16,19 +17,28 @@ def parse_schedule(
     sched_list: list[dict],
     theme_dict: dict[str, Theme],
 ) -> dict[dttime, Theme]:
-    sched_dict: dict[dttime, Theme] = {}
+    sched_dict: dict[dttime, ScheduleItem] = {}
     for sc in sched_list:
-        sched_dict[_str_to_time(sc["time"])] = theme_dict[sc["theme"]]
+        sched_dict[_str_to_time(sc["time"])] = ScheduleItem(
+            theme=theme_dict[sc["theme"]],
+            confirm=sc["confirm"],
+        )
     return sched_dict
 
 
-class ThemeSchedule:
-    def __init__(self, sched_dict: dict[dttime, Theme]) -> None:
+@dataclass
+class ScheduleItem:
+    theme: Theme
+    confirm: bool
+
+
+class ThemeScheduler:
+    def __init__(self, sched_dict: dict[dttime, ScheduleItem]) -> None:
         self._times = list(sched_dict.keys())
-        self._themes = list(sched_dict.values())
+        self._items = list(sched_dict.values())
         self._sched_max = len(sched_dict)
 
-    def current_scheduled_theme(self) -> Theme:
+    def current_scheduled_theme(self) -> ScheduleItem:
         i = -1
         cur_dt = datetime.now()
         cur_date = cur_dt.date()
@@ -36,7 +46,7 @@ class ThemeSchedule:
             if cur_dt < datetime.combine(cur_date, t):
                 break
             i += 1
-        return self._themes[i]
+        return self._items[i]
 
     def next_scheduled_datetime(self) -> datetime:
         i = 0
@@ -67,16 +77,16 @@ def run_scheduling(config: dict[str, list[dict] | Any]) -> None:
             theme_dict=theme_dict,
         )
     except KeyError as e:
-        message.show_error(e.message)
+        message.show_error(e)
         return
-    theme_schedule = ThemeSchedule(sched_dict=sched_dict)
+    theme_schedule = ThemeScheduler(sched_dict=sched_dict)
 
     def apply_scheduled_theme() -> None:
         time.sleep(application_delay)
-        sched_theme = theme_schedule.current_scheduled_theme()
+        sched_item = theme_schedule.current_scheduled_theme()
 
-        if sched_theme.ask:
-            if not message.ask_ifyes(f'Apply theme, "{sched_theme.name}"?'):
+        if sched_item.confirm:
+            if not message.ask_ifyes(f"Change theme now?"):
                 ask_dt = datetime.now() + timedelta(minutes=ask_interval_mins)
                 next_dt = theme_schedule.next_scheduled_datetime()
                 if ask_dt < next_dt:
@@ -86,12 +96,11 @@ def run_scheduling(config: dict[str, list[dict] | Any]) -> None:
                 schedule_theme_application(at_dt=sched_dt)
                 return
 
-        sched_theme = theme_schedule.current_scheduled_theme()
-        if sched_theme.mode is not None:
-            print(sched_theme.mode)
-            personalization.apply_colormode(mode=sched_theme.mode)
-        if sched_theme.wp is not None:
-            personalization.apply_wallpaper(wp=sched_theme.wp)
+        sched_item = theme_schedule.current_scheduled_theme()
+        if sched_item.theme.mode is not None:
+            personalization.apply_colormode(mode=sched_item.theme.mode)
+        if sched_item.theme.wp is not None:
+            personalization.apply_wallpaper(wp=sched_item.theme.wp)
         next_dt = theme_schedule.next_scheduled_datetime()
         schedule_theme_application(at_dt=next_dt)
 

@@ -16,7 +16,6 @@ def parse_themes(theme_list: list[dict]) -> dict[str, Theme]:
             name=th["name"],
             mode=ColorMode(mode_) if mode_ is not None else None,
             wp=Path(wp_) if wp_ is not None else None,
-            ask=th.get("ask_before_applying", False),
         )
     return theme_dict
 
@@ -26,7 +25,6 @@ class Theme:
     name: str
     mode: ColorMode | None = None
     wp: Path | None = None
-    ask: bool = False
 
 
 class ColorMode(Enum):
