@@ -2,13 +2,13 @@
 
 - Enable scheduled theme changes with the following command:
   ```
-  python -m pytheme theme schedule
+  python -m pytheme schedule
   ```
 - Manually change themes with the following command:
   ```
-  python -m pytheme theme use {name}
+  python -m pytheme use {name}
   ```
   You can see the list of themes with the following command:
   ```
-  python -m pytheme theme list
+  python -m pytheme list
   ```
