@@ -17,19 +17,13 @@ def cli(ctx: Any) -> None:
     ctx.obj["config"] = config
 
 
-@click.group()
-@click.pass_context
-def theme(ctx: Any) -> None:
-    pass
-
-
-@theme.command()
+@cli.command()
 @click.pass_context
 def schedule(ctx: Any) -> None:
     run_scheduling(config=ctx.obj["config"])
 
 
-@theme.command()
+@cli.command()
 @click.pass_context
 def list(ctx: Any) -> None:
     theme_dict = parse_themes(theme_list=ctx.obj["config"]["themes"])
@@ -37,7 +31,7 @@ def list(ctx: Any) -> None:
         click.echo(name)
 
 
-@theme.command()
+@cli.command()
 @click.argument("name", type=str)
 @click.pass_context
 def use(ctx: Any, name: str) -> None:
@@ -56,5 +50,4 @@ def use(ctx: Any, name: str) -> None:
 
 def main(config_fp: Path) -> None:
     obj = {"fp": config_fp}
-    cli.add_command(theme)
     cli(obj=obj)
