@@ -8,7 +8,7 @@ from typing import Any, Generator
 
 class Message:
     def __init__(self) -> None:
-        self._appname = "AutoDark"
+        self._appname = "PyTheme"
         ctypes.windll.shcore.SetProcessDpiAwareness(True)
 
     @contextmanager
